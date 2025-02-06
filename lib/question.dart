@@ -1,83 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:udemy/answer_button.dart';
+import 'package:udemy/models/quiz_question.dart';
+import 'package:udemy/data/questions.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Question extends StatefulWidget {
-  const Question({super.key});
+  final void Function(String answer) onSeleteAnswer;
+  const Question({
+    required this.onSeleteAnswer,
+    super.key,
+  });
 
   @override
   State<Question> createState() => _QuestionState();
 }
 
 class _QuestionState extends State<Question> {
-  final questions = [
-    'What is Flutter?',
-    'What is a Widget?',
-    'What is State?',
-  ]; // 샘플 질문 목록
+  List<String> selectedAnswers = [];
+  void chooseAnswer(String answer) {
+    selectedAnswers.add(answer);
+  }
 
-  var currentQuestionIndex = 0; // 현재 질문 인덱스
+  var currentQuestionIdx = 0;
 
-  void answerQuestion() {
+  void answerQuestion(String seletedAnswer) {
+    widget.onSeleteAnswer(seletedAnswer);
     setState(() {
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-      }
+      currentQuestionIdx++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    final currentQuestion = questions[currentQuestionIdx];
+    return SizedBox(
+      width: double.infinity,
       child: Container(
-        margin: const EdgeInsets.all(40),
+        margin: EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              questions[currentQuestionIndex],
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
+            Text(currentQuestion.text,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lato(
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                )),
+            SizedBox(
+              height: 20,
             ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: answerQuestion,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 40,
-                ),
-                backgroundColor: const Color.fromARGB(255, 33, 1, 95),
-              ),
-              child: const Text('Answer 1'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: answerQuestion,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 40,
-                ),
-                backgroundColor: const Color.fromARGB(255, 33, 1, 95),
-              ),
-              child: const Text('Answer 2'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: answerQuestion,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 40,
-                ),
-                backgroundColor: const Color.fromARGB(255, 33, 1, 95),
-              ),
-              child: const Text('Answer 3'),
-            ),
+            ...currentQuestion.getShuffled().map((answer) {
+              return AnswerButton(
+                  answerText: answer,
+                  onTap: () {
+                    chooseAnswer(answer);
+                    answerQuestion(answer);
+                  });
+            })
           ],
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:udemy/start_screen.dart';
 void main() {
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Quiz(),
     ),
   );
